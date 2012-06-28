@@ -399,12 +399,12 @@ namespace ScreenshotInject
                                             // Create offscreen surface to use as copy of render target data
                                             using (SwapChain sc = device.GetSwapChain(0))
                                             {
-                                                DebugMessage("Create render target");
+                                                DebugMessage("Create render target " + sc.PresentParameters.Multisample.ToString());
                                                 
                                                 int width = sc.PresentParameters.BackBufferWidth/ratio;
                                                 int height = sc.PresentParameters.BackBufferHeight/ratio;
                                                 _renderTarget = Surface.CreateOffscreenPlain(device, width, height, sc.PresentParameters.BackBufferFormat, Pool.SystemMemory);
-                                                _renderTarget0 = Surface.CreateRenderTarget(device, width, height, sc.PresentParameters.BackBufferFormat, sc.PresentParameters.Multisample, sc.PresentParameters.MultisampleQuality, false);
+                                                _renderTarget0 = Surface.CreateRenderTarget(device, width, height, sc.PresentParameters.BackBufferFormat, MultisampleType.None, 0, false);
                                                 DebugMessage(sc.PresentParameters.BackBufferFormat.ToString());
                                                 //s = _renderTarget.LockRectangle(LockFlags.ReadOnly).Data;
                                                 //int bytes = width * height * 4;

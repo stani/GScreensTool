@@ -599,6 +599,7 @@ namespace ScreenshotInject
                     screenHeight = backBuffer.Description.Height;
                 }
             }
+           
             _font.DrawString(null,
                 text,
                 new Rectangle(0, 0, screenWidth, screenHeight),

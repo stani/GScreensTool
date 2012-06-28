@@ -332,6 +332,7 @@ namespace ScreenshotInject
                             try
                             {
                                 this.DebugMessage("PresentHook: Request Start");
+                                LastRequestTime = DateTime.Now;
                                 DateTime startTime = DateTime.Now;
                                 using (Texture2D texture = Texture2D.FromSwapChain<SlimDX.Direct3D10.Texture2D>(swapChain, 0))
                                 {
@@ -653,11 +654,11 @@ namespace ScreenshotInject
             SlimDX.Direct3D10.Device device = texture.Device;
 
             #region Save BlendState. Maybe can be done with less code?
-            BlendStateDescription bsd = device.OutputMerger.BlendState.Description;
+            BlendState bs = device.OutputMerger.BlendState;
             Color4 bf = device.OutputMerger.BlendFactor;
             int bsm=device.OutputMerger.BlendSampleMask;
             int dsr = device.OutputMerger.DepthStencilReference;
-            DepthStencilStateDescription dssd = device.OutputMerger.DepthStencilState.Description;
+            DepthStencilState dss = device.OutputMerger.DepthStencilState;
             #endregion
 
             if (_font == null)
@@ -668,20 +669,33 @@ namespace ScreenshotInject
             }
 
             _sprite.Begin(SpriteFlags.None);
-            _font.Draw(null,
+            _font.Draw(_sprite,
                 text,
                 new System.Drawing.Rectangle(0, 0, texture.Description.Width, texture.Description.Height),
                 FontDrawFlags.Top | FontDrawFlags.Right | FontDrawFlags.NoClip,
                 System.Drawing.Color.Red);
+
+            
+            if (alpha > 0)
+            {
+                Color c = Color.FromArgb(alpha, System.Drawing.Color.Red);
+                
+                _font.Draw(_sprite,
+                    text2,
+                    new System.Drawing.Rectangle(0, 15, texture.Description.Width, texture.Description.Height-15),
+                    FontDrawFlags.Top | FontDrawFlags.Right | FontDrawFlags.NoClip,
+                    c);
+            }
+            
+            
             _sprite.End();
 
-
             #region Restore Blend State
-            device.OutputMerger.BlendState = BlendState.FromDescription(device, bsd);
+            device.OutputMerger.BlendState = bs;
+            device.OutputMerger.DepthStencilState = dss;
             device.OutputMerger.BlendSampleMask = bsm;
             device.OutputMerger.BlendFactor = bf;
             device.OutputMerger.DepthStencilReference = dsr;
-            device.OutputMerger.DepthStencilState = DepthStencilState.FromDescription(device, dssd);
             #endregion
         }
 

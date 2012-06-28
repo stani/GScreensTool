@@ -51,7 +51,8 @@ namespace TestScreenshot
             comboBox1.SelectedItem = Properties.Settings.Default.format;
 
             textBox2.Text = Properties.Settings.Default.interval.ToString();
-
+            textBox2.Validating+=new CancelEventHandler(textBox2_Validating);
+            textBox2.Validated+=new EventHandler(textBox2_Validated);
             this.Resize += new System.EventHandler(this.Form2_Resize);
             notifyIcon1.DoubleClick+=new EventHandler(notifyIcon1_DoubleClick);
 
@@ -90,7 +91,7 @@ namespace TestScreenshot
         private void PollKeyboard()
         {
             bool pressed = false;
-            Keys key = Keys.K;
+            Keys key = Properties.Settings.Default.key;// Keys.K;
             DateTime pressedTime=DateTime.Now;
             bool longPress=false;
 
@@ -491,6 +492,32 @@ namespace TestScreenshot
 
         }
 
+        private void textBox2_Validating(object sender,
+                System.ComponentModel.CancelEventArgs e)
+        {
+            try
+            {
+                int interval = int.Parse(textBox2.Text);
+                
+                if (interval >= 0)
+                {
+                    Properties.Settings.Default.interval = interval;
+                    Properties.Settings.Default.Save();
+                    return;
+                }
+            }
+            catch{}
+
+            e.Cancel = true;
+            textBox2.Select(0, textBox2.Text.Length);
+            errorProvider1.SetError(textBox2, "Must be positive number or zero");
+            
+        }
+        private void textBox2_Validated(object sender, System.EventArgs e)
+        {
+            // If all conditions have been met, clear the ErrorProvider of errors.
+            errorProvider1.SetError(textBox2, "");
+        }
         private void textBox2_TextChanged(object sender, EventArgs e)
         {
             try

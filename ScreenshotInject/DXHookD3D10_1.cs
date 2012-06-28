@@ -652,18 +652,37 @@ namespace ScreenshotInject
             Texture2D texture = (Texture2D)dev;
             SlimDX.Direct3D10.Device device = texture.Device;
 
+            #region Save BlendState. Maybe can be done with less code?
+            BlendStateDescription bsd = device.OutputMerger.BlendState.Description;
+            Color4 bf = device.OutputMerger.BlendFactor;
+            int bsm=device.OutputMerger.BlendSampleMask;
+            int dsr = device.OutputMerger.DepthStencilReference;
+            DepthStencilStateDescription dssd = device.OutputMerger.DepthStencilState.Description;
+            #endregion
+
             if (_font == null)
             {
+                _sprite = new Sprite(device, 256);
                 _font = new SlimDX.Direct3D10.Font(device, _fd);
 
             }
 
+            _sprite.Begin(SpriteFlags.None);
             _font.Draw(null,
                 text,
                 new System.Drawing.Rectangle(0, 0, texture.Description.Width, texture.Description.Height),
                 FontDrawFlags.Top | FontDrawFlags.Right | FontDrawFlags.NoClip,
-                System.Drawing.Color.Red);                
-            //DrawText(font, new Vector2(100, 100), text, new Color4(System.Drawing.Color.Red.R, System.Drawing.Color.Red.G, System.Drawing.Color.Red.B, System.Drawing.Color.Red.A));
+                System.Drawing.Color.Red);
+            _sprite.End();
+
+
+            #region Restore Blend State
+            device.OutputMerger.BlendState = BlendState.FromDescription(device, bsd);
+            device.OutputMerger.BlendSampleMask = bsm;
+            device.OutputMerger.BlendFactor = bf;
+            device.OutputMerger.DepthStencilReference = dsr;
+            device.OutputMerger.DepthStencilState = DepthStencilState.FromDescription(device, dssd);
+            #endregion
         }
 
         ImageFileFormat GetImageFileFormat(String format)
